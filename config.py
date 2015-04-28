@@ -6,6 +6,10 @@ config for factory test rig
 from math import *
 import os, sys
 
+#Use ETE motion system. Set to 1 to enable 0 to disable.
+ETE=1
+
+#GDB init
 GDB="arm-none-eabi-gdb"
 
 # serial numbers of black magic probes in the various test jigs

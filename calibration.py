@@ -24,3 +24,14 @@ ROTATIONS = {
 	'back' : Rotation(1900, 1920, 180, 0),
 	'slant' : Rotation(2029, 1419, 30, 30),
 }
+
+ROTATIONS_ETE = {
+#                          YAW , Pitch ,
+        'level' : Rotation(0, 0, 0, 0),
+        'right' : Rotation(90, 0, -90, 0),
+        'left' : Rotation(270, 0, 90, 0),
+        'up' : Rotation(90, 90, None, 90),
+        'down' : Rotation(270, 90, None, -90),
+        'back' : Rotation(180, 180, 180, 0),
+        'slant' : Rotation(30, 30, 30, 30),
+
