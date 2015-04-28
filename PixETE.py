@@ -14,6 +14,7 @@ class PixPTE(object):
                                                  timeout=None)
                 else:
                         self.ser = None
+                        
                 self.delay = delay
                 self.roll_steps = roll_steps
                 self.yaw_steps = yaw_steps
