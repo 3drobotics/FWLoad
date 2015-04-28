@@ -4,10 +4,7 @@
 Control PTE gimbal. Based on code by Alan Sanchez
 '''
 
-#Adding this comment to see if it makes it to Jig1
-
 import serial, sys, time
-
 
 class PixPTE(object):
         def __init__(self, port=None, delay=0.1, yaw_steps=28800, roll_steps=9600):
@@ -24,55 +21,63 @@ class PixPTE(object):
                 self.cmd = "31 "
                 self.fixed_bytes ="30 32 "
                 self.end   = "03"
-                self.run   =      "31 30 44 34 " #D106 this is the same as reset. Double check!!!
+                self.run   =      "31 30 44 34 " 
                 self.reset =      "31 30 44 34 " 
-                self.test_pass  =      "31 30 37 38"
+                self.test_pass =  "31 30 37 38"
+                self.test_fail =  "31 30 37 38"
+                self.test_wait =  "31 30 37 38"
+                self.test_work =  "31 30 37 38"
 
-		#Addresses
-
-                self.ADDRESS={'yaw_pos': '31 30 43 38 ',
+	   #Addresses:
+                self.ADDRESS={'yaw_pos': '31 30 43 38 ', #Command dictionary
                               'yaw_speed' :'31 30 43 43 ',
                               'roll_pos': '31 30 44 43 ',
                               'roll_speed': '31 30 45 30 ', 
                               'run':'31 30 44 34 ',
                               'reset':'31 30 44 34 ',
-                              'accel':'31 30 44 34 '}  #Command dictionary
+                              'accel':'31 30 44 34 '}  
 
         def command_hex(self, address, ndec=None):
                 '''generate a command'''
-		#-- Data Translation ------------------
+
+        #Fixed Messages:
                 if address == 'run':
                         PixETE_run =   "02 31 31 30 44 34 30 32 32 32 30 30 03 33 33"
                         return PixETE_run
                 if address == 'reset':
                         return "02 31 31 30 44 34 30 32 34 34 30 30 03 33 37"
+                if address == 'test_wait':
+                        return "02 31 31 30 37 38 30 32 30 30 30 30 03 32 36"
                 if address == 'test_pass':
                         return "02 31 31 30 37 38 30 32 30 31 30 30 03 32 37"
+                if address == 'test_fail':
+                        return "02 31 31 30 37 38 30 32 30 32 30 30 03 32 38"
+                if address == 'test_work':
+                        return "02 31 31 30 37 38 30 32 30 33 30 30 03 32 39"
+
+        #Data Translation:
                 nhex = format(ndec, '04X') #convert dec to hex
                 HLhex = nhex[2]+nhex[3]+nhex[0]+nhex[1] #swap hi and low
                 shex = '%s' %HLhex #convert hex to string
                 idec = [ord(i) for i in shex]#convert each charachter to ascii decimal
                 ihex = [format(i,'02X') for i in idec]#convert each ascii decimal to hex
-
                 data = '%s %s %s %s '% (ihex[0], ihex[1], ihex[2], ihex[3])
-
                 
-		#-- Checksum calculation --------------
-		#cksum = [(int(g,16) for g in ETEchkArray)]
+        #Checksum Calculation:
                 ETEchk = self.cmd+self.ADDRESS[address]+self.fixed_bytes+data+self.end
                 ETE = ETEchk.split(' ') #split ETEchk into a string array
                 cksum = format((int(ETE[0],16)+int(ETE[1],16)+int(ETE[2],16)+int(ETE[3],16)+
-                                int(ETE[4],16)+int(ETE[5],16)+int(ETE[6],16)+int(ETE[7],16)+int(ETE[8],16)+
-                                int(ETE[9],16)+int(ETE[10],16)+int(ETE[11],16)),'02X')
-		#print "this is the checksum hex %s" %cksum
+                                int(ETE[4],16)+int(ETE[5],16)+int(ETE[6],16)+int(ETE[7],16)+
+                                int(ETE[8],16)+int(ETE[9],16)+int(ETE[10],16)+int(ETE[11],16)),'02X')
                 l = [ord(i) for i in cksum] #convert each character to ascii decimal
                 o = [format(n,'02X') for n in l] #convert each ascii decimal to hex
                 size = len(o)
                 ck2 = ' %s' %o[size-1]
                 ck1 = ' %s' %o[size-2]
+
 		#Print PixETE commands:
                 PixETE = self.start+self.cmd+self.ADDRESS[address]+self.fixed_bytes+data+self.end+ck1+ck2 
-                return PixETE
+                return PixETE #Returns control command for ETE
 
         def command_bytes(self, address, d=None):
                 '''write command to serial port'''
@@ -100,12 +105,15 @@ if __name__ == '__main__':
         from argparse import ArgumentParser
         parser = ArgumentParser(description=__doc__)
         
-        parser.add_argument("--port", default=None, help="serial port")
+        parser.add_argument("--port", default=None, help="serial port") #This might need to change to default='/dev/ttyUSB1'
         parser.add_argument("--reset", action='store_true', help="reset jig")
         parser.add_argument("--delay", type=float, default=0.1, help='command delay')
         parser.add_argument("--yaw-steps", type=int, default=28800, help='yaw step size')
         parser.add_argument("--roll-steps", type=int, default=9600, help='roll step size')
         parser.add_argument("--test_pass" , action='store_true', help='show pass screen')
+        parser.add_argument("--test_fail" , action='store_true', help='show fail screen')
+        parser.add_argument("--test_work" , action='store_true', help='show work screen')
+        parser.add_argument("--test_wait" , action='store_true', help='show wait screen')
         parser.add_argument("roll", type=float, default=0, help="roll angle (degrees)")
         parser.add_argument("yaw", type=float, default=0, help="yaw angle (degrees)")
         args = parser.parse_args()
@@ -129,5 +137,21 @@ if __name__ == '__main__':
                 print("displaying pass")
                 pte.command_bytes('test_pass')
                 sys.exit(0)
+
+        if args.test_fail:
+                print("displaying fail")
+                pte.command_bytes('test_fail')
+                sys.exit(0)
+
+        if args.test_work:
+                print("displaying work")
+                pte.command_bytes('test_work')
+                sys.exit(0)
+
+        if args.test_wait:
+                print("displaying wait")
+                pte.command_bytes('test_wait')
+                sys.exit(0)
+
 
         pte.position(args.roll, args.yaw)
