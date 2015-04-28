@@ -8,7 +8,7 @@ import serial, sys, time
 
 
 class PixPTE(object):
-        def __init__(self, port=None, delay=0.1, yaw_steps=38800, roll_steps=9600):
+        def __init__(self, port=None, delay=0.1, yaw_steps=28800, roll_steps=9600):
                 if port is not None:
                         self.ser = serial.Serial(port=port,
                                                  baudrate=9600, bytesize=7, parity='E', stopbits=2,
@@ -27,13 +27,7 @@ class PixPTE(object):
                 self.test_pass  =      "31 30 37 38"
 
 		#Addresses
-                # yaw_pos =      "31 30 43 38 " #D100
-                # yaw_speed =    "31 30 43 43 " #D102
-                # roll_pos =     "31 30 44 43 " #D110 
-                # roll_speed =   "31 30 45 30 " #D112 
-                # run =          "31 30 44 34"  #D106
-                # reset =        "31 30 44 34"  #D106 
-                # accel = "31 30 44 38"  #D108 Need to verify this is indeed acceleration
+
                 self.ADDRESS={'yaw_pos': '31 30 43 38 ',
                               'yaw_speed' :'31 30 43 43 ',
                               'roll_pos': '31 30 44 43 ',
@@ -59,14 +53,7 @@ class PixPTE(object):
                 ihex = [format(i,'02X') for i in idec]#convert each ascii decimal to hex
 
                 data = '%s %s %s %s '% (ihex[0], ihex[1], ihex[2], ihex[3])
-		#checks 
-                # print "Your decimal number is %d" %ndec
-                # print "Your hexadecimal number is %s" %nhex
-                # print "Your hexadecimal H <> L number is %s" %HLhex
-                # print shex
-                # print idec
-                # print "Your hex ascii decimal is"
-                # print ihex
+
                 
 		#-- Checksum calculation --------------
 		#cksum = [(int(g,16) for g in ETEchkArray)]
@@ -114,7 +101,7 @@ if __name__ == '__main__':
         parser.add_argument("--port", default=None, help="serial port")
         parser.add_argument("--reset", action='store_true', help="reset jig")
         parser.add_argument("--delay", type=float, default=0.1, help='command delay')
-        parser.add_argument("--yaw-steps", type=int, default=38800, help='yaw step size')
+        parser.add_argument("--yaw-steps", type=int, default=28800, help='yaw step size')
         parser.add_argument("--roll-steps", type=int, default=9600, help='roll step size')
         parser.add_argument("--test_pass" , action='store_true', help='show pass screen')
         parser.add_argument("roll", type=float, default=0, help="roll angle (degrees)")
