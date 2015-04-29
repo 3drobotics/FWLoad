@@ -102,12 +102,10 @@ class PixPTE(object):
                 self.command_bytes('yaw_pos', yaw_pos)
                 self.command_bytes('run', 'run')
 
-        def rollspeed(self, roll_s):  #specify speed for roll and yaw
-                roll_speed = int(roll_s)
+        def rollspeed(self, roll_speed):  #specify speed for roll and yaw
                 self.command_bytes('roll_speed', roll_speed)
 
-        def yawspeed(self, yaw_s):  #specify speed for roll and yaw
-                yaw_speed = int(yaw_s)
+        def yawspeed(self, yaw_speed):  #specify speed for roll and yaw
                 self.command_bytes('yaw_speed', yaw_speed)
 
 if __name__ == '__main__':
@@ -123,10 +121,10 @@ if __name__ == '__main__':
         parser.add_argument("--test_fail" , action='store_true', help='show fail screen')
         parser.add_argument("--test_work" , action='store_true', help='show work screen')
         parser.add_argument("--test_wait" , action='store_true', help='show wait screen')
-        parser.add_argument("--roll_speed", type=int, default=None, help='roll speed (pulses/sec')
-        parser.add_argument("--yaw_speed", type=int, default=None, help='yaw speed (pulses/sec)')
         parser.add_argument("roll", type=float, default=None, help="roll angle (degrees)")
         parser.add_argument("yaw", type=float, default=None, help="yaw angle (degrees)")
+        parser.add_argument("--roll_speed", type=int, default=None, help='roll speed (pulses/sec')
+        parser.add_argument("--yaw_speed", type=int, default=None, help='yaw speed (pulses/sec)')
 
         args = parser.parse_args()
 
@@ -167,13 +165,13 @@ if __name__ == '__main__':
 
         if args.roll_speed:
             print("changing roll speed")
-            pte.rollspeed(args.roll_s)
+            pte.rollspeed(args.roll_speed)
             
 
         if args.yaw_speed:
             print("changing yaw speed")
-            pte.yawspeed(args.yaw_s)
+            pte.yawspeed(args.yaw_speed)
             
-
+        
         pte.position(args.roll, args.yaw)
 
