@@ -102,10 +102,20 @@ class PixPTE(object):
                 self.command_bytes('yaw_pos', yaw_pos)
                 self.command_bytes('run', 'run')
 
-        def speed(self, roll_s, yaw_s):  #specify speed for roll and yaw
+        # def speed(self, roll_s, yaw_s):  #specify speed for roll and yaw
+        #         roll_speed = int(roll_s)
+        #         yaw_speed = int(yaw_s)
+        #         self.command_bytes('roll_speed', roll_speed)
+        #         self.command_bytes('yaw_speed', yaw_speed)
+        #         self.command_bytes('run', 'run')
+
+        def rollspeed(self, roll_s):  #specify speed for roll and yaw
                 roll_speed = int(roll_s)
-                yaw_speed = int(yaw_s)
                 self.command_bytes('roll_speed', roll_speed)
+                self.command_bytes('run', 'run')
+
+        def yawspeed(self, yaw_s):  #specify speed for roll and yaw
+                yaw_speed = int(yaw_s)
                 self.command_bytes('yaw_speed', yaw_speed)
                 self.command_bytes('run', 'run')
 
@@ -124,9 +134,14 @@ if __name__ == '__main__':
         parser.add_argument("--test_wait" , action='store_true', help='show wait screen')
         parser.add_argument("roll", type=float, default=0, help="roll angle (degrees)")
         parser.add_argument("yaw", type=float, default=0, help="yaw angle (degrees)")
-        parser.add_argument("--speed" , action='store_true', help='change roll and yaw speed')
-        parser.add_argument("roll_speed", type=int, default=0, help="roll speed (steps/sec)")
-        parser.add_argument("yaw_speed", type=int, default=0, help="yaw speed (steps/sec)")
+        
+        parser.add_argument("--roll_s", type=int, default=100, help='roll speed')
+        parser.add_argument("--yaw_s", type=int, default=100, help='yaw speed')
+        # parser.add_argument("--yawspeed" , action='store_true', help='change roll and yaw speed')
+        # parser.add_argument("--rollspeed" , action='store_true', help='change roll and yaw speed')
+
+        #parser.add_argument("roll_s", type=int, default=0, help="roll speed (steps/sec)")
+        #parser.add_argument("yaw_s", type=int, default=0, help="yaw speed (steps/sec)")
 
         args = parser.parse_args()
 
@@ -165,10 +180,20 @@ if __name__ == '__main__':
                 pte.command_bytes('test_wait')
                 sys.exit(0)
 
-        if args.speed:
-                print("changing speed")
-                pte.speed(args.roll_s, args.yaw_s)
-                sys.exit(0)
+        # if args.speed:
+        #        print("changing speed")
+        #        pte.speed(args.roll_s, args.yaw_s)
+        #        sys.exit(0)
+
+        if args.roll_s
+            print("changing roll speed")
+            pte.rollspeed(args.roll_s)
+            sys.exit(0)
+
+        if args.yaw_s
+            print("changing roll speed")
+            pte.yawspeed(args.yaw_s)
+            sys.exit(0)
 
         pte.position(args.roll, args.yaw)
 
