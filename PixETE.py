@@ -106,7 +106,7 @@ if __name__ == '__main__':
         from argparse import ArgumentParser
         parser = ArgumentParser(description=__doc__)
         
-        parser.add_argument("--port", default=None, help="serial port") #This might need to change to default='/dev/ttyUSB1'
+        parser.add_argument("--port", default='/dev/ttyUSB1', help="serial port") #Used to be default=NONE
         parser.add_argument("--reset", action='store_true', help="reset jig")
         parser.add_argument("--delay", type=float, default=0.1, help='command delay')
         parser.add_argument("--yaw-steps", type=int, default=28800, help='yaw step size')
@@ -123,7 +123,7 @@ if __name__ == '__main__':
                 print("Roll too large")
                 sys.exit(1)
 
-        if args.yaw > 338:
+        if args.yaw > 335:
                 print("Yaw too large")
                 sys.exit(1)
 
