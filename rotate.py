@@ -15,7 +15,7 @@ from pymavlink.quaternion import Quaternion
 import mav_reference
 import connection
 import random
-from PixETE import PixPTE
+from PixETE import PixETE
 
 def quat_division(quat, rquat):
     '''quaternion division'''
@@ -104,10 +104,18 @@ def optimise_attitude(conn, rotation, tolerance, timeout=25):
     '''optimise attitude using servo changes'''
     expected_roll = ROTATIONS[rotation].roll
     expected_pitch = ROTATIONS[rotation].pitch
-    chan1 = ROTATIONS[rotation].chan1
-    chan2 = ROTATIONS[rotation].chan2
+    if ETE == 0:
+        chan1 = ROTATIONS[rotation].chan1
+        chan2 = ROTATIONS[rotation].chan2
+    elif ETE == 1:
+        chan1 = ROTATIONS_ETE[rotation].chan1
+        chan2 = ROTATIONS_ETE[rotation].chan2
 
     attitude = wait_quiescent(conn.refmav)
+
+    if ETE == 1:
+        return True
+
     time_start = time.time()
     # we always do at least 2 tries. This means the attitude accuracy
     # will tend to improve over time, while not adding excessive time
@@ -138,26 +146,42 @@ def optimise_attitude(conn, rotation, tolerance, timeout=25):
         if (tries > 0 and (abs(err_roll)+abs(err_pitch) < tolerance or
                            (abs(chan1_change)<1 and abs(chan2_change)<1))):
             logger.info("%s converged %.2f %.2f tolerance %.1f at %s" % (rotation, err_roll, err_pitch, tolerance, time.ctime()))
-            # update optimised rotations to save on convergence time for the next board
 
-        if ETE == 0
-            ROTATIONS[rotation].chan1 = chan1
-            ROTATIONS[rotation].chan2 = chan2
-            logger.info("optimise_attitude: ROTATIONS[%s]  chan1:%s   chan2:%s" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
+            # update optimised rotations to save on convergence time for the next board
+            if ETE == 0:
+                ROTATIONS[rotation].chan1 = chan1
+                ROTATIONS[rotation].chan2 = chan2
+                logger.info("optimise_attitude: ROTATIONS[%s]  chan1:%s   chan2:%s" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
+            elif ETE == 1:
+                 ROTATIONS_ETE[rotation].chan1 = chan1
+                 ROTATIONS_ETE[rotation].chan2 = chan2
+            
             return True
+        
         chan1 += chan1_change
         chan2 += chan2_change
+        if ETE == 0:
             if chan1 < 700 or chan1 > 2300 or chan2 < 700 or chan2 > 2300:
                 logger.debug("servos out of range - failed")
                 return False
 
-        util.set_servo(conn.refmav, YAW_CHANNEL, chan1)
-        util.set_servo(conn.refmav, PITCH_CHANNEL, chan2)
+            util.set_servo(conn.refmav, YAW_CHANNEL, chan1)
+            util.set_servo(conn.refmav, PITCH_CHANNEL, chan2)
+        elif ETE == 1:
+            #if chan1 > 360 or chan2 > 360 or chan1 < 0 or chan2 < 0:
+            #    logger.debug("ete jig out of range - failed")
+            #    return False
+            if chan1 > 360:
+                chan1 -= 360
+            if chan2 > 360:
+                chan2 -= 360
+            if chan1 < 0:
+                chan1 += 360
+            if chan2 < 0:
+                chan2 += 360
 
-        if ETE == 1
-            pte = PixPTE('/dev/ttyUSB0', 0.1, 28800, 9600)
-            pte.position(chan2, chan1)
-
+            ete = PixETE()
+            ete.position(chan2, chan1)
       
         attitude = wait_quiescent(conn.refmav)
         tries += 1
@@ -176,14 +200,13 @@ def set_rotation(conn, rotation, wait=True, timeout=25):
 
     logger.info("set_rotation: call set_servo -- YAW rotation[%s].chan1=%s      PITCH rotation[%s].chan2=%s" % (rotation, ROTATIONS[rotation].chan1, rotation, ROTATIONS[rotation].chan2) )
     
-    if ETE == 0
-    # start with initial settings from the table
-    util.set_servo(conn.refmav, YAW_CHANNEL, ROTATIONS[rotation].chan1)
-    util.set_servo(conn.refmav, PITCH_CHANNEL, ROTATIONS[rotation].chan2)
-    
-    elif ETE == 1
-        pte = PixPTE('/dev/ttyUSB1', 1.0, 28800, 9600)
-        pte.position(ROTATIONS_ETE[rotation].chan2, ROTATIONS_ETE[rotation].chan1)
+    if ETE == 0:
+        # start with initial settings from the table
+        util.set_servo(conn.refmav, YAW_CHANNEL, ROTATIONS[rotation].chan1)
+        util.set_servo(conn.refmav, PITCH_CHANNEL, ROTATIONS[rotation].chan2)
+    elif ETE == 1:
+        ete = PixETE()
+        ete.position(ROTATIONS_ETE[rotation].chan2, ROTATIONS_ETE[rotation].chan1)
 
     if not wait:
         return conn.refmav.recv_match(type='ATTITUDE', blocking=True, timeout=3)

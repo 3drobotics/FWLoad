@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 '''
-Control PTE gimbal. Based on code by Alan Sanchez
+Control ETE gimbal. Based on code by Alan Sanchez
 '''
 
 import serial, sys, time
 
-class PixPTE(object):
-        def __init__(self, port=None, delay=0.1, yaw_steps=28800, roll_steps=9600):
+class PixETE(object):
+        def __init__(self, port='/dev/ttyUSB1', delay=0.1, yaw_steps=28800, roll_steps=9600):
                 if port is not None:
                         self.ser = serial.Serial(port=port,
                                                  baudrate=9600, bytesize=7, parity='E', stopbits=2,
@@ -121,8 +121,8 @@ if __name__ == '__main__':
         parser.add_argument("--test_fail" , action='store_true', help='show fail screen')
         parser.add_argument("--test_work" , action='store_true', help='show work screen')
         parser.add_argument("--test_wait" , action='store_true', help='show wait screen')
-        parser.add_argument("roll", type=float, default=None, help="roll angle (degrees)")
-        parser.add_argument("yaw", type=float, default=None, help="yaw angle (degrees)")
+        parser.add_argument("roll", type=float, default=0, nargs='?', help="roll angle (degrees)")
+        parser.add_argument("yaw", type=float, default=0, nargs='?', help="yaw angle (degrees)")
         parser.add_argument("--roll_speed", type=int, default=None, help='roll speed (pulses/sec')
         parser.add_argument("--yaw_speed", type=int, default=None, help='yaw speed (pulses/sec)')
 
@@ -136,42 +136,41 @@ if __name__ == '__main__':
                 print("Yaw too large")
                 sys.exit(1)
 
-        pte = PixPTE(port=args.port, delay=args.delay, yaw_steps=args.yaw_steps, roll_steps=args.roll_steps)
+        ete = PixETE(port=args.port, delay=args.delay, yaw_steps=args.yaw_steps, roll_steps=args.roll_steps)
 
         if args.reset:
                 print("Resetting")
-                pte.command_bytes('reset')
+                ete.command_bytes('reset')
                 sys.exit(0)
 
         if args.test_pass:
                 print("displaying pass")
-                pte.command_bytes('test_pass')
+                ete.command_bytes('test_pass')
                 
 
         if args.test_fail:
                 print("displaying fail")
-                pte.command_bytes('test_fail')
+                ete.command_bytes('test_fail')
                 
 
         if args.test_work:
                 print("displaying work")
-                pte.command_bytes('test_work')
+                ete.command_bytes('test_work')
                 
 
         if args.test_wait:
                 print("displaying wait")
-                pte.command_bytes('test_wait')
+                ete.command_bytes('test_wait')
                 
 
         if args.roll_speed:
             print("changing roll speed")
-            pte.rollspeed(args.roll_speed)
+            ete.rollspeed(args.roll_speed)
             
 
         if args.yaw_speed:
             print("changing yaw speed")
-            pte.yawspeed(args.yaw_speed)
-            
+            ete.yawspeed(args.yaw_speed)   
         
-        pte.position(args.roll, args.yaw)
+        ete.position(args.roll, args.yaw)
 
