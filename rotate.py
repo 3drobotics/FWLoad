@@ -140,48 +140,27 @@ def optimise_attitude(conn, rotation, tolerance, timeout=25):
         (chan1_change, chan2_change) = gimbal_controller(dcm_estimated,
                                                          dcm_demanded, chan1)
         (err_roll, err_pitch) = attitude_error(attitude, expected_roll, expected_pitch)
-#        logger.debug("%s offsets: %.2f %.2f chan1=%u chan2=%u" % (rotation, err_roll, err_pitch, chan1, chan2))
         logger.info("optimise_attitude: %s err_roll=%.2f   err_pitch=%.2f   chan1=%u chan2=%u" % (rotation, err_roll, err_pitch, chan1, chan2))
-#        logger.info("Try %s -- rotation: %s   err_roll: %.2f  err_pitch: %.2f    tolerance %.1f at %s" % (tries, rotation, err_roll, err_pitch, tolerance, time.ctime()))
         if (tries > 0 and (abs(err_roll)+abs(err_pitch) < tolerance or
                            (abs(chan1_change)<1 and abs(chan2_change)<1))):
-            logger.info("%s converged %.2f %.2f tolerance %.1f at %s" % (rotation, err_roll, err_pitch, tolerance, time.ctime()))
+            logger.debug("%s converged %.2f %.2f tolerance %.1f" % (rotation, err_roll, err_pitch, tolerance))
 
             # update optimised rotations to save on convergence time for the next board
-            if ETE == 0:
-                ROTATIONS[rotation].chan1 = chan1
-                ROTATIONS[rotation].chan2 = chan2
-                logger.info("optimise_attitude: ROTATIONS[%s]  chan1:%s   chan2:%s" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
-            elif ETE == 1:
-                 ROTATIONS_ETE[rotation].chan1 = chan1
-                 ROTATIONS_ETE[rotation].chan2 = chan2
+            ROTATIONS[rotation].chan1 = chan1
+            ROTATIONS[rotation].chan2 = chan2
+            logger.debug("optimise_attitude: ROTATIONS[%s]  chan1:%s   chan2:%s" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
             
             return True
         
         chan1 += chan1_change
         chan2 += chan2_change
-        if ETE == 0:
-            if chan1 < 700 or chan1 > 2300 or chan2 < 700 or chan2 > 2300:
-                logger.debug("servos out of range - failed")
-                return False
 
-            util.set_servo(conn.refmav, YAW_CHANNEL, chan1)
-            util.set_servo(conn.refmav, PITCH_CHANNEL, chan2)
-        elif ETE == 1:
-            #if chan1 > 360 or chan2 > 360 or chan1 < 0 or chan2 < 0:
-            #    logger.debug("ete jig out of range - failed")
-            #    return False
-            if chan1 > 360:
-                chan1 -= 360
-            if chan2 > 360:
-                chan2 -= 360
-            if chan1 < 0:
-                chan1 += 360
-            if chan2 < 0:
-                chan2 += 360
+        if chan1 < 700 or chan1 > 2300 or chan2 < 700 or chan2 > 2300:
+            logger.debug("servos out of range - failed")
+            return False
 
-            ete = PixETE()
-            ete.position(chan2, chan1)
+        util.set_servo(conn.refmav, YAW_CHANNEL, chan1)
+        util.set_servo(conn.refmav, PITCH_CHANNEL, chan2)
       
         attitude = wait_quiescent(conn.refmav)
         tries += 1
@@ -198,7 +177,7 @@ def set_rotation(conn, rotation, wait=True, timeout=25):
     expected_roll = ROTATIONS[rotation].roll
     expected_pitch = ROTATIONS[rotation].pitch
 
-    logger.info("set_rotation: call set_servo -- YAW rotation[%s].chan1=%s      PITCH rotation[%s].chan2=%s" % (rotation, ROTATIONS[rotation].chan1, rotation, ROTATIONS[rotation].chan2) )
+    logger.debug("set_rotation: call set_servo -- YAW rotation[%s].chan1=%s      PITCH rotation[%s].chan2=%s" % (rotation, ROTATIONS[rotation].chan1, rotation, ROTATIONS[rotation].chan2) )
     
     if ETE == 0:
         # start with initial settings from the table
@@ -234,7 +213,7 @@ def gyro_integrate(conn):
     util.param_set(conn.ref, 'SR0_RAW_SENS', 20)
     util.param_set(conn.test, 'SR0_RAW_SENS', 20)
 
-    logger.info("Starting gyro integration at %s" % time.ctime())
+    logger.info("Starting gyro integration")
     wait_quiescent(conn.refmav)
     conn.discard_messages()
 
