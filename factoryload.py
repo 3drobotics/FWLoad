@@ -16,6 +16,9 @@ import colour_text
 import connection
 import barcode
 import savedstate
+from PixETE import PixETE
+
+ete = PixETE()
 
 fh = open(os.path.realpath(__file__), 'r')
 try:
@@ -47,6 +50,8 @@ def factory_install(device_barcode):
     '''main factory installer'''
     start_time = time.time()
 
+    ete.command_bytes('test_work')
+
     if not args.test:
         colour_text.clear_screen()
 
@@ -55,7 +60,7 @@ def factory_install(device_barcode):
     logger.reopen_logfile()
 
     logdir = logger.get_log_dir()
-    logger.info("Logging to %s" % logdir)
+    logger.debug("Logging to %s" % logdir)
 
     colour_text.print_blue('''
 ==================================================
@@ -63,8 +68,6 @@ def factory_install(device_barcode):
 ==================================================
 ''' % device_barcode)
 
-    logger.info(time.ctime())
-    
     if args.erase:
         if not jtag.erase_firmwares():
             colour_text.print_fail('''
@@ -73,6 +76,7 @@ def factory_install(device_barcode):
 ======================================
 ''')
             logger.critical("JTAG firmware erase failed")
+            ete.command_bytes('test_fail')
             return False
     
     if not args.nofw and not jtag.load_all_firmwares(retries=3):
@@ -82,6 +86,7 @@ def factory_install(device_barcode):
 ======================================
 ''')
         logger.critical("JTAG firmware install failed")
+        ete.command_bytes('test_fail')
         return False
 
     if args.erase:
@@ -101,6 +106,7 @@ def factory_install(device_barcode):
 ==========================================
 ''')
         logger.critical("Accelerometer calibration failed")
+        ete.command_bytes('test_fail')
         return False
 
     # all OK
@@ -111,6 +117,7 @@ def factory_install(device_barcode):
 ================================================
 ''' %  (device_barcode, (time.time() - start_time)))
     logger.info("Factory install complete (%u seconds)" % (time.time() - start_time))
+    ete.command_bytes('test_pass')
     return True
 
 # load the jig state file
@@ -122,6 +129,12 @@ while True:
     jigstate = savedstate.get()
     logger.info("jigstate: total_cycles = %i" % jigstate['total_cycles'])
     logger.info("jigstate: current_cycles = %i" % jigstate['current_cycles'])
+
+    # Set ETE speeds
+    if ETE == 1:
+        ete = PixETE()
+        ete.yawspeed(5000)
+        ete.rollspeed(5000)
 
     util.kill_processes(['mavproxy.py', GDB])
 
@@ -135,6 +148,7 @@ while True:
 
     device_barcode = None
     if not args.test:
+        ete.command_bytes('test_wait')
         colour_text.print_blue('''
 ==========================================
 | PLEASE SWIPE DEVICE BARCODE
