@@ -77,16 +77,16 @@ class Connection(object):
 
         try:
             if not ref_only:
-                logger.info("CONNECTING MAVLINK TO TEST BOARD at %s" % time.ctime())
+                logger.info("CONNECTING MAVLINK TO TEST BOARD")
                 self.testmav = mavutil.mavlink_connection('127.0.0.1:14551')
                 util.wait_heartbeat(self.testmav, timeout=30)
-                logger.info("got heartbeat at %s" % time.ctime())
+                logger.info("Got heartbeat")
                 util.wait_mode(self.testmav, IDLE_MODES)
                 logger.info("Waiting for 'Ready to FLY'")
                 self.test.expect('Ready to FLY', timeout=20)
         except Exception as ex:
             self.close()
-            util.show_error('Connecting to test board2 at %s' % time.ctime(), ex, self.testlog)
+            util.show_error('Connecting to test board2', ex, self.testlog)
 
         if self.nsh is not None:
             # log any extra nsh data

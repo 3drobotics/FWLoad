@@ -102,7 +102,7 @@ log_fh = None
 
 # create a console handler with a higher log level
 log_ch = logging.StreamHandler()
-log_ch.setLevel(logging.DEBUG)
+log_ch.setLevel(logging.INFO)
 
 # create a serial handler for output using a FTDI
 log_ser = SerialHandler()

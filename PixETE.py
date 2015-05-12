@@ -90,7 +90,7 @@ class PixETE(object):
                 a = hex.split(' ')
                 for v in a:
                         bytes += chr(int(v, base=16))
-                print("sending: %s" % hex)
+                #print("sending: %s" % hex)
                 time.sleep(self.delay)
                 self.ser.write(bytes)
 
