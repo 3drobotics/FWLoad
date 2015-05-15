@@ -34,9 +34,9 @@ parser.add_argument("--test", default=False, action='store_true', help="run in t
 parser.add_argument("--once", default=False, action='store_true', help="run one install only")
 parser.add_argument("--nofw", default=False, action='store_true', help="don't reload firmware")
 parser.add_argument("--erase", default=False, action='store_true', help="erase firmware and parameters")
+parser.add_argument("-v", "--verbose", default=None, action='store_true', help="verbose console output")
 parser.add_argument("--monitor", default=None, help="monitor address")
 parser.add_argument("--barcode", default=None, help="override barcode")
-parser.add_argument("-v", "--verbose", default=None, help="verbose console output")
 args = parser.parse_args()
 
 if args.monitor:
