@@ -201,8 +201,7 @@ def wait_gyros(conn):
 
 def accel_calibrate_run(conn):
     '''run accelcal'''
-    logger.info("STARTING ACCEL CALIBRATION")
-
+    
     wait_gyros(conn)
     time.sleep(2)
 

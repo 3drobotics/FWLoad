@@ -241,6 +241,7 @@ def gyro_integrate(conn):
             util.failure("Y gyro %u error: %.1f" % (idx, err.y))
         if abs(err.z) > GYRO_SUM_TOLERANCE:
             util.failure("Z gyro %u error: %.1f" % (idx, err.z))
+    logger.info("Gyro integration finished")
 
 
 def unjam_servos(conn):
