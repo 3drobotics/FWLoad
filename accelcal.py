@@ -260,7 +260,7 @@ def accel_calibrate_run(conn):
 def accel_calibrate():
     '''run full accel calibration'''
 
-    logger.info("Starting accel cal at %s" % time.ctime())
+    logger.info("Starting accel cal")
 
     conn = connection.Connection()
     logger.info("FW version: %s" % conn.fw_version)
@@ -349,7 +349,7 @@ def accel_calibrate_reference():
         conn.ref.send("\n")
     i = conn.ref.expect(["Calibration successful","Calibration FAILED"])
     if i != 0:
-        util.failure("Accel calibration failed at %s" % time.ctime())
+        util.failure("Accel calibration failed")
     logger.info("Calibration successful")
     rotate.set_rotation(conn, 'level', wait=False)
     util.param_set(conn.ref, 'AHRS_TRIM_X', 0)

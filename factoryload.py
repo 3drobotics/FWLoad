@@ -64,8 +64,6 @@ def factory_install(device_barcode):
 | Starting installation. Barcode is %s
 ==================================================
 ''' % device_barcode)
-
-    logger.info(time.ctime())
     
     if args.erase:
         if not jtag.erase_firmwares():
