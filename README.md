@@ -10,6 +10,10 @@ The system assumes it has two Pixhawks in the test jig. One is the
 Pixhawk may be a bare board without any isolated IMUs. The reference
 Pixhawk should have no microSD.
 
+## OS Tweaks
+
+`sudo dmesg -n 1` is added to `/etc/rc.local` to suppress the message `This device cannot do calls on its own. It is not a modem.`.
+
 ### Test Jig
 
 The test jig is assumed to have two servos in a gimbal
