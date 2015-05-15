@@ -67,7 +67,7 @@ class Connection(object):
             util.show_error('Connecting to test board1', ex, self.testlog)
 
         try:
-            logger.info("CONNECTING MAVLINK TO REFERENCE BOARD")
+            logger.debug("CONNECTING MAVLINK TO REFERENCE BOARD")
             self.refmav = mavutil.mavlink_connection('127.0.0.1:14550')
             util.wait_heartbeat(self.refmav, timeout=30)
             util.wait_mode(self.refmav, IDLE_MODES)
@@ -77,12 +77,12 @@ class Connection(object):
 
         try:
             if not ref_only:
-                logger.info("CONNECTING MAVLINK TO TEST BOARD")
+                logger.debug("CONNECTING MAVLINK TO TEST BOARD")
                 self.testmav = mavutil.mavlink_connection('127.0.0.1:14551')
                 util.wait_heartbeat(self.testmav, timeout=30)
-                logger.info("got heartbeat")
+                logger.debug("got heartbeat")
                 util.wait_mode(self.testmav, IDLE_MODES)
-                logger.info("Waiting for 'Ready to FLY'")
+                logger.debug("Waiting for 'Ready to FLY'")
                 self.fw_version = None
                 self.px4_version = None
                 self.nuttx_version = None
@@ -129,7 +129,7 @@ class Connection(object):
             self.close()
             util.show_error('testing reference gyros', ex)
 
-        logger.info("Setting rotation level")
+        logger.debug("Setting rotation level")
         try:
             rotate.set_rotation(self, 'level', wait=False)
         except Exception as ex:
@@ -155,7 +155,7 @@ class Connection(object):
 
     def close(self):
         '''close all connections'''
-        logger.info("Closing all connections")
+        logger.debug("Closing all connections")
         if self.refmav:
             self.refmav.close()
             self.refmav = None
@@ -179,14 +179,14 @@ class Connection(object):
 def erase_parameters():
     '''erase parameters on test board'''
     conn = Connection()
-    logger.info("Setting SYSID_SW_MREV to 0")
+    logger.debug("Setting SYSID_SW_MREV to 0")
     conn.test.send('param set SYSID_SW_MREV 0\n')
     time.sleep(1)
-    logger.info("rebooting")
+    logger.debug("rebooting")
     conn.test.send('reboot\n')
     util.discard_messages(conn.testmav)
     util.wait_mode(conn.testmav, IDLE_MODES, timeout=30)
-    logger.info("Parameters erased")
+    logger.debug("Parameters erased")
     return True
 
 if __name__ == '__main__':

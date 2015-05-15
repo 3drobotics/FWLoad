@@ -117,7 +117,6 @@ def optimise_attitude(conn, rotation, tolerance, timeout=25, quick=False):
     tries = 0
     
     while time.time() < time_start+timeout:
-        #logger.info("============================= BEGIN ROTATIONS  try=%s =================" % (tries))
         dcm_estimated = Matrix3()
         dcm_estimated.from_euler(attitude.roll, attitude.pitch, attitude.yaw)
     
@@ -134,10 +133,10 @@ def optimise_attitude(conn, rotation, tolerance, timeout=25, quick=False):
         (chan1_change, chan2_change) = gimbal_controller(dcm_estimated,
                                                          dcm_demanded, chan1)
         (err_roll, err_pitch) = attitude_error(attitude, expected_roll, expected_pitch)
-        logger.info("optimise_attitude: %s err_roll=%.2f err_pitch=%.2f c1=%u c2=%u" % (rotation, err_roll, err_pitch, chan1, chan2))
+        logger.debug("optimise_attitude: %s err_roll=%.2f err_pitch=%.2f c1=%u c2=%u" % (rotation, err_roll, err_pitch, chan1, chan2))
         if (tries > 0 and (abs(err_roll)+abs(err_pitch) < tolerance or
                            (abs(chan1_change)<1 and abs(chan2_change)<1))):
-            logger.info("%s converged %.2f %.2f tolerance %.1f" % (rotation, err_roll, err_pitch, tolerance))
+            logger.debug("%s converged %.2f %.2f tolerance %.1f" % (rotation, err_roll, err_pitch, tolerance))
             # update optimised rotations to save on convergence time for the next board
             ROTATIONS[rotation].chan1 = chan1
             ROTATIONS[rotation].chan2 = chan2
@@ -164,7 +163,7 @@ def set_rotation(conn, rotation, wait=True, timeout=25, quick=False):
     expected_roll = ROTATIONS[rotation].roll
     expected_pitch = ROTATIONS[rotation].pitch
 
-    logger.info("set_rotation: %s chan1=%u chan2=%u" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
+    logger.debug("set_rotation: %s chan1=%u chan2=%u" % (rotation, ROTATIONS[rotation].chan1, ROTATIONS[rotation].chan2) )
     # start with initial settings from the table
     util.set_servo(conn.refmav, YAW_CHANNEL, ROTATIONS[rotation].chan1)
     util.set_servo(conn.refmav, PITCH_CHANNEL, ROTATIONS[rotation].chan2)

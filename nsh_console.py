@@ -9,12 +9,12 @@ import logger, time
 
 def nsh_console(interactive=False):
     '''connect to nsh on test board'''
-    logger.info("CONNECTING TO NSH CONSOLE")
+    logger.debug("CONNECTING TO NSH CONSOLE")
     if interactive:
         logfile = None
     else:
         logfile = logger.new_tlog("TestNSH", extension='log')
-        logger.info("nsh logging to %s" % logfile)
+        logger.debug("nsh logging to %s" % logfile)
     cmd = "mavproxy.py --baudrate 57600 --setup --master %s" % FMU_DEBUG
     if logfile is not None:
         cmd += " --logfile %s" % logfile

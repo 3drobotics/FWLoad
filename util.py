@@ -155,7 +155,7 @@ def wait_mode(mav, modes, timeout=10):
     while time.time() < start_time+timeout:
         wait_heartbeat(mav, timeout=10)
         if mav.flightmode != last_mode:
-            logger.info("Flightmode %s" % mav.flightmode)
+            logger.debug("Flightmode %s" % mav.flightmode)
             last_mode = mav.flightmode
         if mav.flightmode in modes:
             return

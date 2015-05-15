@@ -9,7 +9,7 @@ import logger
 
 def mav_reference(reflog=None, extra_args=None):
     '''connect to reference board'''
-    logger.info("CONNECTING TO REFERENCE BOARD")
+    logger.debug("CONNECTING TO REFERENCE BOARD")
     logfile = logger.new_tlog("RefBoard")
     cmd = "mavproxy.py --master %s --out 127.0.0.1:14550 --logfile %s" % (USB_DEV_REFERENCE, logfile)
     if REMOTE_MONITOR['ref']:

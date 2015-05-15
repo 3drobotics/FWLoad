@@ -81,7 +81,7 @@ def erase_firmware(device, mcu_id):
         gdb.send('y\n')
         gdb.expect("Detached from remote")
         gdb.close()
-        logger.info("closed")
+        logger.debug("closed")
     except Exception as ex:
         util.show_error('Erasing firmware', ex)
     logger.info("Erase done")

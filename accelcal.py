@@ -156,7 +156,7 @@ def wait_gyros_healthy(conn):
     # give time for 1Hz loop to set orientation
     time.sleep(2)
 
-    logger.info("Waiting for gyro health")
+    logger.debug("Waiting for gyro health")
     start_time = time.time()
     ref_gyros_healthy = False
     test_gyros_healthy = False
@@ -174,7 +174,7 @@ def wait_gyros_healthy(conn):
     if not test_gyros_healthy:
         logger.error("Failed to get healthy test gyros")
         return False
-    logger.info("Gyros are healthy")
+    logger.debug("Gyros are healthy")
     return True
 
 def wait_gyros(conn):
@@ -185,10 +185,10 @@ def wait_gyros(conn):
         if not wait_gyros_healthy(conn):
             util.failure("Failed to get healthy gyros")
         rotate.wait_quiescent(conn.refmav)
-        logger.info("Reference is quiescent")
+        logger.debug("Reference is quiescent")
         try:
             rotate.wait_quiescent_list(conn.testmav, ['RAW_IMU', 'SCALED_IMU2', 'SCALED_IMU3'])
-            logger.info("Test is quiescent")
+            logger.debug("Test is quiescent")
         except Exception as ex:
             logger.debug("Recalibrating gyros : %s" % ex)
             conn.test.send('gyrocal\n')
@@ -197,7 +197,7 @@ def wait_gyros(conn):
         break
     if tries == 0:
         util.failure("Failed waiting for gyros")
-    logger.info("Gyros ready")
+    logger.debug("Gyros ready")
 
 def accel_calibrate_run(conn):
     '''run accelcal'''
@@ -214,7 +214,7 @@ def accel_calibrate_run(conn):
     conn.test.expect('Calibrated')
     wait_gyros(conn)
 
-    logger.info("Turning safety off")
+    logger.debug("Turning safety off")
     rotate.set_rotation(conn, 'level', wait=False)
     util.safety_off(conn.refmav)
 
@@ -238,11 +238,11 @@ def accel_calibrate_run(conn):
     i = conn.test.expect(["Calibration successful","Calibration FAILED"])
     if i != 0:
         logger.error(conn.test.before)
-        logger.error("Calibration FAILED")
+        logger.error("Accel Calibration FAILED")
         util.show_tail(conn.testlog)
         util.failure("Accel calibration failed")
-    #logger.info(conn.test.before)
-    logger.info("Calibration successful")
+
+    logger.info("Accel Calibration successful")
     rotate.write_calibration()
     rotate.set_rotation(conn, 'level', wait=False)
 
@@ -263,14 +263,14 @@ def accel_calibrate():
     logger.info("Starting accel cal")
 
     conn = connection.Connection()
-    logger.info("FW version: %s" % conn.fw_version)
-    logger.info("PX4 version: %s" % conn.px4_version)
-    logger.info("NuttX version: %s" % conn.nuttx_version)
-    logger.info("STM32 serial: %s" % conn.stm32_serial)
+    logger.debug("FW version: %s" % conn.fw_version)
+    logger.debug("PX4 version: %s" % conn.px4_version)
+    logger.debug("NuttX version: %s" % conn.nuttx_version)
+    logger.debug("STM32 serial: %s" % conn.stm32_serial)
 
     # lock the two telemetry ports to prevent the COMMAND_ACK messages in accel cal
     # from looping back between the two telemetry ports
-    logger.info("Locking telemetry ports")
+    logger.debug("Locking telemetry ports")
     util.lock_serial_port(conn.testmav, mavutil.mavlink.SERIAL_CONTROL_DEV_TELEM1)
     util.lock_serial_port(conn.testmav, mavutil.mavlink.SERIAL_CONTROL_DEV_TELEM2)
 
@@ -290,7 +290,7 @@ def accel_calibrate():
         util.show_error('Test sensors failed', ex)
 
     try:
-        logger.info("Loading factory parameters")
+        logger.debug("Loading factory parameters")
         conn.test.send('param load %s\n' % FACTORY_PARM)
         conn.test.expect('Loaded \d+ parameters from')
         logger.info("Parameters loaded OK")
