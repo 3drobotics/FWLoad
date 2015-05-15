@@ -93,6 +93,11 @@ def reopen_logfile():
     log_fh.setFormatter(log_formatter)
     log.addHandler(log_fh)
 
+def enable_console_debug():
+    '''set the console handler log level to DEBUG'''
+    if log_ch is not None:
+        log_ch.setLevel(logging.DEBUG)
+
 # create a logger for 'testjig'
 log = logging.getLogger('testjig')
 log.setLevel(logging.DEBUG)
@@ -102,7 +107,7 @@ log_fh = None
 
 # create a console handler with a higher log level
 log_ch = logging.StreamHandler()
-log_ch.setLevel(logging.DEBUG)
+log_ch.setLevel(logging.INFO)
 
 # create a serial handler for output using a FTDI
 log_ser = SerialHandler()

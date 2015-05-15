@@ -36,11 +36,15 @@ parser.add_argument("--nofw", default=False, action='store_true', help="don't re
 parser.add_argument("--erase", default=False, action='store_true', help="erase firmware and parameters")
 parser.add_argument("--monitor", default=None, help="monitor address")
 parser.add_argument("--barcode", default=None, help="override barcode")
+parser.add_argument("-v", "--verbose", default=None, help="verbose console output")
 args = parser.parse_args()
 
 if args.monitor:
     REMOTE_MONITOR['ref'] = args.monitor + ":16550"
     REMOTE_MONITOR['test'] = args.monitor + ":16551"
+
+if args.verbose:
+    logger.enable_console_debug()
 
 colour_text.print_blue("Starting up")
 
