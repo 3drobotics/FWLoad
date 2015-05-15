@@ -94,9 +94,14 @@ def reopen_logfile():
     log.addHandler(log_fh)
 
 def enable_console_debug():
-    '''set the console handler log level to DEBUG'''
+    '''set the console handler log level to DEBUG and display level in console output'''
+    global log_ch, log, log_formatter
     if log_ch is not None:
-        log_ch.setLevel(logging.DEBUG)
+        log.removeHandler(log_ch)
+    log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    log_ch.setLevel(logging.DEBUG)
+    log_ch.setFormatter(log_formatter)
+    log.addHandler(log_ch)
 
 # create a logger for 'testjig'
 log = logging.getLogger('testjig')
@@ -114,7 +119,7 @@ log_ser = SerialHandler()
 log_ser.setLevel(logging.DEBUG)
 
 # create a formatter and add it to the handlers
-log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+log_formatter = logging.Formatter('%(asctime)s - %(message)s')
 log_ch.setFormatter(log_formatter)
 log_ser.setFormatter(log_formatter)
 

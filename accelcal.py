@@ -201,7 +201,7 @@ def wait_gyros(conn):
 
 def accel_calibrate_run(conn):
     '''run accelcal'''
-    
+
     wait_gyros(conn)
     time.sleep(2)
 
@@ -331,7 +331,7 @@ def accel_calibrate_reference():
 
     conn = connection.Connection(ref_only=True)
 
-    logger.info("Turning safety off")
+    logger.debug("Turning safety off")
     rotate.set_rotation(conn, 'level', wait=False)
     util.safety_off(conn.refmav)
 

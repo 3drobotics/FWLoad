@@ -190,7 +190,6 @@ def check_status(conn):
 
 def check_pwm(conn):
     '''check PWM output and RC input'''
-    logger.info("Checking PWM out and RC in")
 
     # disable safety on test board
     conn.test.send('arm safetyoff\n')
@@ -226,7 +225,9 @@ def check_pwm(conn):
         if abs(rc - map_values[i]) > 3:
             pwm_ok = False
         logger.debug("pwm_check[%u] rc=%u test=%u servo=%u" % (i, rc, map_values[i], servoval))
-    if not pwm_ok:
+    if pwm_ok:
+        logger.ingo("PWM OK")
+    else:
         util.failure("Incorrect PWM passthrough")
 
 def check_all_sensors(conn):

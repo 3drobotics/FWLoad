@@ -139,7 +139,7 @@ def load_all_firmwares(retries=3):
         power_control.power_cycle(down_time=4)
 
         if not util.wait_devices([FMU_DEBUG]):
-            logger.info("Failed to find nsh console device")
+            logger.error("Failed to find nsh console device")
             continue
 
         logger.debug("Checking nsh console")
@@ -177,14 +177,14 @@ def load_all_firmwares(retries=3):
             if i == 5:
                 failure = "****** ArduPilot failed to start - general failure ******"
         if failure is not None:
-            logger.info(failure)
+            logger.error(failure)
             colour_text.print_fail(failure)
             continue
 
         if util.wait_devices([USB_DEV_TEST, USB_DEV_REFERENCE]):
             break
 
-        logger.info("Failed to find USB devices")  
+        logger.error("Failed to find USB devices")  
         if retries > 0:
             logger.info("RETRIES %u - TRYING AGAIN" % retries)
     if retries == 0:

@@ -124,8 +124,7 @@ savedstate.reset('current_cycles')
 while True:
     logger.get_ftdi()
     jigstate = savedstate.get()
-    logger.info("jigstate: total_cycles = %i" % jigstate['total_cycles'])
-    logger.info("jigstate: current_cycles = %i" % jigstate['current_cycles'])
+    logger.info("Jig Cycles (total/current): %i/%i" % (jigstate['total_cycles'], jigstate['current_cycles']))
 
     util.kill_processes(['mavproxy.py', GDB])
 

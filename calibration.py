@@ -18,9 +18,9 @@ ROTATIONS = {
 #                          YAW , Pitch ,
 	'level' : Rotation(1500, 1500, 0, 0),
 	'right' : Rotation(1700, 1720, -90, 0),
-	'left' : Rotation(1300, 1720, 90, 0),
-	'up' : Rotation(1500, 1720, None, 90),
-	'down' : Rotation(1900, 1720, None, -90),
-	'back' : Rotation(1900, 1920, 180, 0),
+	'left'  : Rotation(1300, 1720, 90, 0),
+	'up'    : Rotation(1500, 1720, None, 90),
+	'down'  : Rotation(1900, 1720, None, -90),
+	'back'  : Rotation(1900, 1920, 180, 0),
 	'slant' : Rotation(2029, 1419, 30, 30),
 }
